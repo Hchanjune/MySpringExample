@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hchan.spr.mapper.board.ListMapper">
+
+	<select id="selectBoardContent"
+		resultType="com.hchan.spr.domain.board.BoardDto">
+		SELECT board.id AS id,  
+			board.title AS title, 
+			board.inserted AS inserted,
+			COUNT(reply.id) AS numOfReplies 
+		FROM Board AS board LEFT JOIN Reply AS reply ON board.id=reply.board_id
+		GROUP BY board.id
+		ORDER BY board.id DESC
+		LIMIT #{from}, #{row}
+	</select>
+
+	<select id="getPostById"
+		resultType="com.hchan.spr.domain.board.BoardDto">
+		SELECT id, 
+			title, 
+			body, 
+			inserted 
+		FROM Board
+		WHERE id = #{id}
+	</select>
+
+	<select id="getRepliesByPostId"
+		resultType="com.hchan.spr.domain.board.ReplyDto">
+		SELECT id,
+			content,
+			inserted
+		FROM Reply
+		WHERE board_id = #{id}
+	</select>
+	
+	<insert id="insertReply">
+		INSERT INTO Reply (board_id, content)
+		VALUES(#{boardId}, #{content})
+	</insert>
+	
+	<insert id ="insertPost" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO Board (title, body)
+		VALUES(#{title}, #{body})
+	</insert>
+	
+	<update id ="updatePost">
+		UPDATE Board
+		SET title = #{title},
+			body = #{body}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id = "deleteReplyById">
+		DELETE FROM Reply
+		WHERE id = #{id}
+	</delete>
+	
+	<delete id = "deleteReplyByBoardId">
+		DELETE FROM Reply
+		WHERE board_id = #{id}
+	</delete>
+	
+	<delete id = "deleteBoardById">
+		DELETE FROM Board
+		WHERE id = #{id}
+	</delete>
+	
+	<update id ="updateReplyById">
+		UPDATE Reply
+		SET content = #{content}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="selectSearchedBoardContent" resultType="com.hchan.spr.domain.board.BoardDto">
+		SELECT id, title, inserted FROM Board
+		WHERE title LIKE #{value}
+		ORDER BY id DESC
+		LIMIT #{from}, #{row}
+	</select>
+	
+	<select id="countBoardContents" resultType="int">
+		SELECT Count(id) 
+		FROM Board 
+	</select>
+	
+	<select id="countSearchedBoardContents" resultType="int">
+		SELECT Count(id) 
+		FROM Board 
+		WHERE title LIKE #{value}
+	</select>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
